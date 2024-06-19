@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  app:
+    image: node:20
+    command: sh -c "if [ \"$NODE_ENV\" = 'development' ]; then npm run dev; else npm start; fi"
+    ports:
+      - "3000:${PORT}"
+    depends_on:
+      - postgres
+    volumes:
+      - ./:/app/
+      - /app/node_modules
+    env_file:
+      - .env
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    working_dir: /app
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
